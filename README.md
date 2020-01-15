@@ -5,8 +5,8 @@ The app allows to:
 - put labels on the image (div with any text).
 - resize the image, when the window is scaled. 
 - when you change the image zoom, the labels retain their positions relative to the edges of the image. 
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-The version 1-3 features the ability to to delete labels
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-The version 1-3 features the ability to drag and drop labels
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The version 1-3 features the ability to to delete labels.
+
+The version 1-3 features the ability to drag and drop labels.
+
