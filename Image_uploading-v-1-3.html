@@ -1,0 +1,200 @@
+<!-- The app ver.-1-3 allows to:
+- upload an image from the browser and see a preview of that image. Preview the image in full screen.
+- you can put "tags" on the image (div with any text).
+- when you resize the window, the image is scaled. 
+- when you change the image zoom, the labels retain their positions relative to the edges of the image. 
+- ability to delete labels
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+The version features the ability to drag and drop labels
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-->
+<!DOCTYPE html>
+<style type='text/css'>
+	body{
+	margin: 0;
+	}
+	img {
+	display: none;
+	width: 100%;
+	height: auto;
+	position: relative;
+	}
+    input {
+    padding: 1%;
+    }
+    input[type="text"] {
+    margin: 0;
+    display: block;
+    max-width: 12vw;
+    }
+	label {
+	display: flex;
+	}
+    .header{
+    display: flex;
+    justify-content: space-between;
+    }
+    .text {
+    position: absolute;
+    display: flex;
+    background: #c0c0c099;
+    padding: 2px;
+    max-width: 16vw;
+    max-height: 1.5vw
+    }
+	#wrap {
+	position: relative;
+	}
+    .close{
+    border-radius: 50%;
+    width: 1.5vw;
+    height: 1.5vw;
+    font-size: 1.0vw;
+    line-height: 1.0vw;
+    background: white;
+    font-family: monospace;
+    text-decoration: none;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+    .drag{    
+    width: 2vw;
+    margin: 1px;
+    border: 1px solid white;
+    cursor: move;
+    }
+    #tip{
+    display: none;
+    margin: 1% 2%;
+    color: blue;
+    font-family: monospace;
+    }
+</style>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+    <div class="header">
+        <input type="file" onchange="previewFile()">
+        <div id="tip">Click on the image to add a label</div>
+    </div>
+	<div id="wrap">
+		<img src="" alt="Image preview..." onclick="enterLabel()">
+	</div>
+</body>
+</html>
+
+
+<script>
+
+var counter = 0;
+var body = document.querySelector('body');
+var inp = document.querySelector('input[type=file]');
+
+
+//Loading and preview a file
+function previewFile() {
+	  let preview = document.querySelector('img');
+	  let file    = document.querySelector('input[type=file]').files[0];
+	  let reader  = new FileReader();
+	  reader.onloadend = function () {
+	    preview.src = reader.result;
+	    preview.style.display = "block";
+        document.getElementById("tip").style.display = "block";
+	  }
+	  if (file) {
+	    reader.readAsDataURL(file);
+	  } else {
+	    preview.src = "";
+	  }
+	}
+
+
+//Creating a new div element
+function enterLabel(){
+    counter++;
+	let label = document.createElement("div");
+	let wrap = document.getElementById("wrap");
+    label.className = "text";
+    label.id = counter;
+ 
+    //Calculating Top coordinate of the label relative to the image
+    let hgt = event.pageY-inp.offsetHeight; 
+    let tp = hgt*100/wrap.offsetHeight-2;// 2 - is a input padding 
+    //Calculating Left coordinate of the label relative to the image
+    let lft = event.pageX*100/body.offsetWidth;
+
+    label.style.left = lft.toFixed(2)+"%"; // Left coordinate of the label in %    
+    label.style.top = tp.toFixed(2)+"%"; // Top coordinate of the label in %  
+    wrap.appendChild(label);    
+    dragElement(label);//Make the DIV element draggagle:
+
+    //Adding the Drag label button
+    let drag = document.createElement("div");
+    drag.className = "drag";  
+    drag.id = "drag"+counter;  
+    drag.setAttribute("title", "Drag a label");
+    label.appendChild(drag);
+
+    //Adding the Input field to the created div
+    let textfield = document.createElement("input");
+    textfield.type = "text";
+    //textfield.className = "innertext";
+    label.appendChild(textfield);
+
+    //Adding the Delete label button
+    let close = document.createElement("a");
+    close.className = "close";    
+    close.setAttribute("href", "#");
+    close.id = "cls"+counter;
+    close.setAttribute("onclick", "closeLabel("+counter+")");
+    close.setAttribute("title", "Delete a label");
+    label.appendChild(close);
+    close.innerHTML = "x";
+}
+
+
+//Delete labels function
+function closeLabel(j){
+if (confirm("Delete the label?")) {
+    document.getElementById(j).remove();
+    } else {
+        alert("You canceled the label deletion")
+        }
+}
+	
+
+//Drag and drop labels function
+function dragElement(elmnt) {
+    elmnt.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;//for IE8
+
+        // calculate the new cursor position:
+        let hgt = event.pageY-inp.offsetHeight; 
+        let lft = event.pageX*100/body.offsetWidth;
+        let tp = hgt*100/wrap.offsetHeight-2;
+
+        elmnt.style.top = tp.toFixed(2) + "%";
+        elmnt.style.left = lft.toFixed(2) + "%"; 
+    }
+
+    function closeDragElement() {    
+        // stop moving when mouse button is released:    
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+
+
+</script>
